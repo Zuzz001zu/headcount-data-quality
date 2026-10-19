@@ -69,3 +69,38 @@ def test_age_bands():
     )
     ages = analyse(sources).tables["headcount_by_age"].set_index("age_band")["headcount"]
     assert ages.to_dict() == {"< 25": 1, "55+": 1}
+
+
+def test_entries_and_exits_of_the_period():
+    sources = make_sources(
+        [
+            employee("E10001"),
+            employee("E10002", date_entree="14.09.2026"),
+            employee("E10003", date_sortie="15.09.2026"),
+            employee("E10004", date_sortie="30.09.2026"),  # last day: still in headcount
+            employee("E10005", date_sortie="31.08.2026"),  # previous month
+            employee("E10006", unite="FOR-OBL", date_entree="01.09.2026"),
+        ],
+        [pay(i) for i in ["E10001", "E10002", "E10003", "E10004", "E10006"]],
+    )
+    result = analyse(sources)
+    moves = result.tables["movements_by_department"].set_index("department")
+
+    assert moves.loc["Finances"].to_dict() == {
+        "entries": 1,
+        "exits": 2,
+        "net_change": -1,
+        "exit_rate_pct": round(100 * 2 / 3, 1),
+    }
+    assert moves.loc["Formation", "entries"] == 1
+    assert result.totals["headcount"] == 4
+
+    people = result.tables["movements_list"]
+    assert people["movement"].tolist() == ["Entrée", "Entrée", "Sortie", "Sortie"]
+    assert people["employee_id"].tolist() == ["E10006", "E10002", "E10003", "E10004"]
+
+
+def test_department_without_movement_is_listed_with_zeros(clean_sources):
+    moves = analyse(clean_sources).tables["movements_by_department"]
+    assert moves["entries"].sum() == 0
+    assert set(moves["department"]) == {"Finances", "Formation"}

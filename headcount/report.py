@@ -52,6 +52,14 @@ HEADERS = {
     "field": "Champ",
     "value": "Valeur",
     "description": "Description",
+    "entries": "Entrées",
+    "exits": "Sorties",
+    "net_change": "Variation nette",
+    "exit_rate_pct": "Taux de sortie (%)",
+    "movement": "Mouvement",
+    "date": "Date",
+    "last_name": "Nom",
+    "first_name": "Prénom",
 }
 FORMATS = {
     "fte": ONE_DECIMAL,
@@ -59,6 +67,7 @@ FORMATS = {
     "average_age": ONE_DECIMAL,
     "average_activity_rate": ONE_DECIMAL,
     "share_pct": ONE_DECIMAL,
+    "exit_rate_pct": ONE_DECIMAL,
     "payroll_total": CHF,
 }
 SEVERITY_LABELS = {"error": "Bloquante", "warning": "Avertissement"}
@@ -125,6 +134,7 @@ def summary_sheet(ws: Worksheet, result: Result) -> None:
     ws["A2"] = f"Période : {period_label(s.period)} — effectif au {s.reference_date:%d.%m.%Y}"
 
     t = result.totals
+    moves = result.tables["movements_by_department"]
     figures = [
         ("Lignes SIRH lues", len(s.employees), None),
         ("Lignes de salaire lues", len(s.payroll), None),
@@ -135,6 +145,8 @@ def summary_sheet(ws: Worksheet, result: Result) -> None:
         ("Équivalents plein temps (ETP)", float(t["fte"]), ONE_DECIMAL),
         ("Taux d'activité moyen (%)", float(t["average_activity_rate"]), ONE_DECIMAL),
         ("Masse salariale mensuelle (CHF)", float(t["payroll_total"]), CHF),
+        ("Entrées sur la période", int(moves["entries"].sum()), None),
+        ("Sorties sur la période", int(moves["exits"].sum()), None),
     ]
     ws["A4"] = "Chiffres clés"
     ws["A4"].font = SECTION_FONT
@@ -237,6 +249,18 @@ def breakdown_sheet(ws: Worksheet, result: Result) -> None:
     ws.add_chart(chart, "F3")
 
 
+def movements_sheet(ws: Worksheet, result: Result) -> None:
+    ws["A1"] = "Entrées et sorties"
+    ws["A1"].font = TITLE_FONT
+    last = write_table(ws, result.tables["movements_by_department"], 3)
+
+    top = last + 2
+    ws.cell(row=top, column=1, value="Détail des mouvements").font = SECTION_FONT
+    people = result.tables["movements_list"].copy()
+    people["date"] = pd.to_datetime(people["date"]).dt.strftime("%d.%m.%Y")
+    write_table(ws, people, top + 1)
+
+
 def issues_sheet(ws: Worksheet, result: Result) -> None:
     # "error" sorts before "warning", so blocking anomalies come first
     issues = result.issues.sort_values(["severity", "rule_id", "employee_id"], na_position="last")
@@ -260,6 +284,7 @@ def write_report(result: Result, out_dir: Path) -> Path:
         ("Effectifs", headcount_sheet),
         ("Unités", units_sheet),
         ("Répartition", breakdown_sheet),
+        ("Mouvements", movements_sheet),
         ("Anomalies", issues_sheet),
     ]
     for index, (title, build) in enumerate(sheets):

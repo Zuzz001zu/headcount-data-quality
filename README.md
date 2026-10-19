@@ -28,7 +28,8 @@ This project automates that monthly work:
 3. **Consolidate** the validated records in SQLite; employees with a blocking anomaly
    are left out until the source is corrected.
 4. **Report**: headcount, FTE, payroll by department and unit, breakdown by contract
-   and age, and the full list of anomalies to send back to the data owners.
+   and age, entries and exits of the month, and the full list of anomalies to send back
+   to the data owners.
 
 ## Quality rules
 
@@ -68,6 +69,9 @@ An employee is counted when, on the **last day of the period**, they are under c
 (hired on or before that day, no exit date or an exit date on or after it) **and** have
 at least one payroll line for the period. FTE is the sum of activity rates / 100;
 several part-time contracts of the same person count as one person.
+
+Entries and exits are the hire and exit dates that fall within the period. The exit
+rate of a department is its exits divided by its headcount on the last day.
 
 The SQL is kept in [`headcount/sql/`](headcount/sql) so it can be reviewed and reused
 on its own.
