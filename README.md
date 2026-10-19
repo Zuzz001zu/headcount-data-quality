@@ -6,7 +6,7 @@ Monthly pipeline that takes the HR and payroll exports of an organisation, check
 against a set of business rules, consolidates them in SQL and produces the headcount
 statistics as an Excel report.
 
-> **FR** — Consolidation et contrôle qualité des données RH et salaires, puis calcul des
+> **FR** - Consolidation et contrôle qualité des données RH et salaires, puis calcul des
 > effectifs (effectif, ETP, répartition) avec rapport Excel. Python, pandas, SQL (SQLite),
 > openpyxl. Données d'exemple entièrement fictives.
 
