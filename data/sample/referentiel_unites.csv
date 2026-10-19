@@ -1,0 +1,15 @@
+﻿code_unite;libelle;departement
+FIN-CPT;Comptabilité générale;Finances
+FIN-IMP;Administration des impôts;Finances
+FIN-SIN;Systèmes d'information;Finances
+SAN-HOP;Coordination hospitalière;Santé et action sociale
+SAN-AID;Aide sociale;Santé et action sociale
+SAN-PRE;Prévention et promotion de la santé;Santé et action sociale
+FOR-OBL;Enseignement obligatoire;Formation
+FOR-PRO;Formation professionnelle;Formation
+INF-ROU;Routes et ouvrages d'art;Infrastructures
+INF-BAT;Bâtiments;Infrastructures
+SEC-POL;Police administrative;Sécurité
+SEC-PCI;Protection civile;Sécurité
+TER-ENV;Environnement;Territoire et environnement
+TER-AMT;Aménagement du territoire;Territoire et environnement
