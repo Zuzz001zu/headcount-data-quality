@@ -16,6 +16,8 @@ TABLES = [
     "headcount_by_unit",
     "headcount_by_contract",
     "headcount_by_age",
+    "movements_by_department",
+    "movements_list",
 ]
 
 

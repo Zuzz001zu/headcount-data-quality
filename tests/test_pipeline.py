@@ -50,7 +50,14 @@ def test_report_has_all_sheets(generated, tmp_path):
     path = report.write_report(result, tmp_path)
 
     wb = load_workbook(path)
-    assert wb.sheetnames == ["Synthèse", "Effectifs", "Unités", "Répartition", "Anomalies"]
+    assert wb.sheetnames == [
+        "Synthèse",
+        "Effectifs",
+        "Unités",
+        "Répartition",
+        "Mouvements",
+        "Anomalies",
+    ]
     assert wb["Synthèse"]["A2"].value.startswith("Période : septembre 2026")
     assert wb["Anomalies"].max_row == len(result.issues) + 1
     assert len(wb["Effectifs"]._charts) == 1
